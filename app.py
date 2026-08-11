@@ -5,32 +5,27 @@ import io
 
 st.set_page_config(
     page_title="Pneumonia Detection AI",
-    page_icon="🫁",
     layout="centered"
 )
 
-st.title("🫁 Chest X-Ray Pneumonia Detection")
+st.title("Chest X-Ray Pneumonia Detection")
 st.write("Upload a chest X-ray image to get an immediate AI diagnosis.")
 
-# Upload Widget
 uploaded_file = st.file_uploader("Choose a Chest X-Ray image...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    # Display the uploaded image
     image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded X-Ray Image", use_column_width=True)
+    st.image(image, caption="Uploaded X-Ray Image", use_container_width=True)
 
-    if st.button("Analyze Image 🔬", type="primary"):
+    if st.button("Analyze Image", type="primary"):
         with st.spinner("Analyzing image through CNN model..."):
             try:
-                # Prepare file payload for FastAPI backend
                 bytes_data = uploaded_file.getvalue()
                 files = {"file": (uploaded_file.name, bytes_data, uploaded_file.type)}
 
-                # Call FastAPI backend
                 response = requests.post("http://127.0.0.1:8000/predict", files=files)
 
-                if response.status_code == 200:
+                if response.status_code==200:
                     data = response.json()
                     prediction = data["prediction"]
                     confidence = data["confidence"] * 100
@@ -40,7 +35,7 @@ if uploaded_file is not None:
                     st.subheader("Analysis Results")
 
                     # Display visual result cards
-                    if prediction == "PNEUMONIA":
+                    if prediction=="PNEUMONIA":
                         st.error(f"### Diagnosis: **PNEUMONIA DETECTED**")
                     else:
                         st.success(f"### Diagnosis: **NORMAL**")
@@ -49,9 +44,8 @@ if uploaded_file is not None:
                     with col1:
                         st.metric(label="Model Confidence", value=f"{confidence:.2f}%")
                     with col2:
-                        st.metric(label="Requires Review", value="Yes ⚠️" if flagged else "No ✅")
+                        st.metric(label="Requires Review", value="Yes" if flagged else "No")
 
-                    # Confidence Progress Bar
                     st.write("**Probability Breakdown:**")
                     for cls, prob in data["class_probabilities"].items():
                         st.write(f"- **{cls}:** {prob * 100:.2f}%")
