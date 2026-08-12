@@ -28,9 +28,7 @@ def get_data_transforms():
     return train_transform,eval_transform
 
 def create_dataloaders(data_dir: str,batch_size: int=BATCH_SIZE):
-    """
-    Builds PyTorch DataLoaders for Train, Validation, and Test splits.
-    """
+    """Builds PyTorch DataLoaders for Train, Validation, and Test splits."""
     train_transform,eval_transform=get_data_transforms()
 
     train_dataset=datasets.ImageFolder(os.path.join(data_dir,'train'),transform=train_transform)
@@ -39,8 +37,8 @@ def create_dataloaders(data_dir: str,batch_size: int=BATCH_SIZE):
 
     test_dataset=datasets.ImageFolder(os.path.join(data_dir, 'test'),transform=eval_transform)
 
-    train_loader=DataLoader(train_dataset,batch_size=batch_size,shuffle=True,num_workers=2)
-    val_loader=DataLoader(val_dataset,batch_size=batch_size,shuffle=False,num_workers=2)
-    test_loader=DataLoader(test_dataset,batch_size=batch_size,shuffle=False,num_workers=2)
+    train_loader=DataLoader(train_dataset,batch_size=batch_size,shuffle=True,num_workers=0)
+    val_loader=DataLoader(val_dataset,batch_size=batch_size,shuffle=False,num_workers=0)
+    test_loader=DataLoader(test_dataset,batch_size=batch_size,shuffle=False,num_workers=0)
 
     return train_loader,val_loader,test_loader,train_dataset.classes
