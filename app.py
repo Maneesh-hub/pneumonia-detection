@@ -7,6 +7,7 @@ st.set_page_config(
     page_title="Pneumonia Detection AI",
     layout="centered"
 )
+API_URL="http://127.0.0.1:8000/predict"
 
 st.title("Chest X-Ray Pneumonia Detection")
 st.write("Upload a chest X-ray image to get an immediate AI diagnosis.")
@@ -23,7 +24,7 @@ if uploaded_file is not None:
                 bytes_data = uploaded_file.getvalue()
                 files = {"file": (uploaded_file.name, bytes_data, uploaded_file.type)}
 
-                response = requests.post("http://127.0.0.1:8000/predict", files=files)
+                response = requests.post(API_URL, files=files)
 
                 if response.status_code==200:
                     data = response.json()
