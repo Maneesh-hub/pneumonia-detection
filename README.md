@@ -1,66 +1,96 @@
-# Chest X-Ray Pneumonia Detection System
+Markdown
+# Chest X-Ray Pneumonia Inference Server
 
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/Maneesh-hub/pneumonia-detection)
 
-An end-to-end medical AI diagnostic tool that processes uploaded chest radiograph images through a fine-tuned **ResNet18** Deep Convolutional Neural Network (PyTorch) to return real-time diagnostic predictions, confidence scores, and clinical triage alerts. The application consists of a low-latency **FastAPI** backend served alongside an interactive **Streamlit** user interface.
+A high-performance asynchronous FastAPI inference backend powering a PyTorch (ResNet18) Deep CNN model for real-time pneumonia detection from chest radiograph images, accompanied by a lightweight Streamlit diagnostic client.
 
 ---
 
-## Live Deployment Links
+## Local Setup & Execution Guide
 
-* **GitHub Repository:** [https://github.com/Maneesh-hub/pneumonia-detection](https://github.com/Maneesh-hub/pneumonia-detection)
-* **Frontend Web UI (Streamlit):** `https://pneumonia-detection-mfyhgav44utq9jzgywiubm.streamlit.app`
-* **Backend API (Render):** `https://pneumonia-detection-api.onrender.com`
-* **Interactive API Docs (Swagger UI):** `https://pneumonia-detection-api.onrender.com/docs`
+Follow these steps to clone the repository, set up the environment, and launch both the backend server and frontend client locally.
 
----
+### 1. Clone the Repository
 
-## Key Features
-
-* **ResNet18 CNN Architecture:** Fine-tuned deep network leveraging transfer learning for high-accuracy chest X-ray image classification.
-* **FastAPI REST Backend:** Asynchronous API service (`POST /predict`) built for scalable, low-latency model inference.
-* **Streamlit Interactive UI:** Drag-and-drop web dashboard for doctors and developers to visualize diagnosis, confidence percentages, and probability distributions.
-* **Clinical Triage Flagging:** Automatically tags positive or uncertain detections with `flag_for_review: true` for prioritized secondary medical review.
-
----
-
-## System Architecture
-
-```text
-[ User / Web Dashboard (Streamlit) ]
-                 │
-                 │ HTTP POST (Multipart Image Bytes)
-                 ▼
-     [ FastAPI Backend Engine ]
-                 │
-                 ├──> Preprocessing (224x224 Resize, ImageNet Normalization)
-                 │
-                 ├──> PyTorch ResNet18 Model Inference (models/pneumonia_cnn.pt)
-                 │
-                 └──> Confidence & Clinical Triage Evaluation
-                 │
-                 ▼
-    [ Structured JSON Response ]
-Repository Directory StructurePlaintextpneumonia-detection/
-├── app.py                   # Streamlit web frontend application
-├── requirements.txt         # Python dependencies
-├── README.md                # Project documentation
-├── models/
-│   └── pneumonia_cnn.pt     # Saved PyTorch ResNet18 model weights
-└── src/
-    ├── main.py              # FastAPI server implementation
-    ├── model.py             # ResNet18 neural network architecture
-    └── evaluate.py          # Model evaluation metrics script
-Local Setup & Installation1. Clone the RepositoryBashgit clone [https://github.com/Maneesh-hub/pneumonia-detection.git](https://github.com/Maneesh-hub/pneumonia-detection.git)
+```bash
+git clone [https://github.com/Maneesh-hub/pneumonia-detection.git](https://github.com/Maneesh-hub/pneumonia-detection.git)
 cd pneumonia-detection
-2. Set Up Virtual EnvironmentWindows (PowerShell):PowerShellpython -m venv .venv
+2. Set Up Virtual Environment
+Windows (PowerShell):
+
+PowerShell
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-macOS / Linux:Bashpython3 -m venv .venv
+macOS / Linux:
+
+Bash
+python3 -m venv .venv
 source .venv/bin/activate
-3. Install Package DependenciesBashpip install -r requirements.txt
-How to Run LocallyRunning the full application locally requires two separate terminal windows:Step 1: Launch the FastAPI Backend (Terminal 1)Bashpython -m uvicorn src.main:app --reload --port 8000
-Access local API docs at: http://127.0.0.1:8000/docsStep 2: Launch the Streamlit Frontend (Terminal 2)Bashpython -m streamlit run app.py
-Access local dashboard UI at: http://localhost:8501API Documentation & UsageEndpoints OverviewMethodEndpointDescriptionGET/healthHealth check endpoint returning model loading statusPOST/predictPrimary inference endpoint for processing image filesSample POST /predict Payload & ResponseRequestContent-Type: multipart/form-dataBody: file (Image in .jpg, .jpeg, or .png format)Response (200 OK)JSON{
+3. Install Dependencies
+Bash
+pip install -r requirements.txt
+How to Run the System
+Running the complete application requires two open terminal windows.
+
+Step 1: Launch the FastAPI Backend (Terminal 1)
+Execute the backend Uvicorn server from the root directory:
+
+Bash
+python -m uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+Local API Base URL: http://127.0.0.1:8000
+
+Interactive OpenAPI/Swagger Interface: http://127.0.0.1:8000/docs
+
+Step 2: Launch the Streamlit Client UI (Terminal 2)
+In a second terminal window, launch the Streamlit dashboard client:
+
+Bash
+streamlit run app.py
+Local Dashboard UI: http://localhost:8501
+
+Repository Directory Structure
+Plaintext
+pneumonia-detection/
+├── app.py                  # Streamlit visual frontend client
+├── requirements.txt        # Managed Python dependencies
+├── README.md               # Setup & project documentation
+├── .gitignore              # Git ignore configuration
+├── models/
+│   └── pneumonia_cnn.pt    # Serialized PyTorch model checkpoint
+├── data/
+│   ├── test/               # Test set radiograph images
+│   ├── train/              # Training set radiograph images
+│   └── val/                # Validation set radiograph images
+└── src/
+    ├── dataset.py          # PyTorch Dataset & DataLoader creation script
+    ├── evaluate.py         # Model evaluation metrics script
+    ├── main.py             # FastAPI backend server & API endpoints
+    ├── model.py            # Neural network architecture definition
+    └── train.py            # Model training & checkpointing script
+API Documentation & Endpoint Specification
+1. GET /health
+Checks server status, verifies model memory availability, and identifies the active hardware device (cpu / cuda).
+
+Response (200 OK):
+
+JSON
+{
+  "status": "healthy",
+  "model_loaded": true,
+  "device": "cpu"
+}
+2. POST /predict
+Processes an uploaded chest radiograph image through PyTorch preprocessing transforms (224x224 resize, tensor conversion, ImageNet mean/std normalization) and returns binary classification predictions, class probabilities, and a clinical triage flag.
+
+Request Format: multipart/form-data
+
+Body Parameter: file (.jpg, .jpeg, .png)
+
+Response (200 OK):
+
+JSON
+{
   "filename": "person78_bacteria_386.jpeg",
   "prediction": "PNEUMONIA",
   "confidence": 0.9988,
@@ -70,4 +100,17 @@ Access local dashboard UI at: http://localhost:8501API Documentation & UsageEndp
     "PNEUMONIA": 0.9988
   }
 }
-Model & Training DetailsBackbone: ResNet18 (Deep Residual Learning)Framework: PyTorch & TorchvisionInput Resolution: 224 × 224 pixelsNormalization Parameters: Mean [0.485, 0.456, 0.406], Std [0.229, 0.224, 0.225]
+Model Specifications
+Backbone Architecture: Fine-tuned ResNet18 Deep Convolutional Neural Network
+
+Framework: PyTorch & Torchvision
+
+Input Resolution: 224 x 224 pixels
+
+ImageNet Normalization:
+
+Mean: [0.485, 0.456, 0.406]
+
+Std: [0.229, 0.224, 0.225]
+
+Evaluation Focus: High Sensitivity / Recall to minimize false-negative clinical misclassifications.
