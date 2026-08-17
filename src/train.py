@@ -63,7 +63,7 @@ def train():
             train_loss+=loss.item()*images.size(0)
 
         epoch_train_loss=train_loss/len(train_loader.dataset)
-        val_loss,val_acc,val_prec,val_rec,val_f1=evaluate_model(model,test_loader,criterion,device)
+        val_loss,val_acc,val_prec,val_rec,val_f1=evaluate_model(model,val_loader,criterion,device)
 
         print(f"Epoch [{epoch+1}/{epochs}] | "
               f"Train Loss: {epoch_train_loss:.4f} | "
@@ -71,7 +71,7 @@ def train():
               f"Val Acc: {val_acc:.4f} | "
               f"Val Recall: {val_rec:.4f}")
 
-        # Save checkpoint with best Recall score
+
         if val_loss < best_val_loss:
             best_val_loss=val_loss
             torch.save(model.state_dict(),model_save_path)
@@ -88,4 +88,4 @@ def train():
     print("--------------------------------------------------\n")
 
 if __name__=='__main__':
-    train()
+    train() 

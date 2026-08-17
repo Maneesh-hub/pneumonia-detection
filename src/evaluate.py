@@ -39,7 +39,7 @@ with torch.no_grad():
         all_labels.extend(labels.numpy())
 
 #4.Print Results
-class_names=test_dataset.classes  #['NORMAL','PNEUMONIA']
+class_names=test_dataset.classes  
 
 print("\n================ CLASSIFICATION REPORT ================")
 print(classification_report(all_labels,all_preds,target_names=class_names,digits=4))

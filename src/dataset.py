@@ -2,7 +2,7 @@ import os
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
-# Standard dimensions & ImageNet normalization parameters
+
 IMAGE_SIZE=(224,224)
 BATCH_SIZE=32
 
@@ -27,7 +27,7 @@ def get_data_transforms():
 
     return train_transform,eval_transform
 
-def create_dataloaders(data_dir: str,batch_size: int=BATCH_SIZE):
+def create_dataloaders(data_dir: str,my_batch_size: int=BATCH_SIZE):
     """Builds PyTorch DataLoaders for Train, Validation, and Test splits."""
     train_transform,eval_transform=get_data_transforms()
 
@@ -37,8 +37,8 @@ def create_dataloaders(data_dir: str,batch_size: int=BATCH_SIZE):
 
     test_dataset=datasets.ImageFolder(os.path.join(data_dir, 'test'),transform=eval_transform)
 
-    train_loader=DataLoader(train_dataset,batch_size=batch_size,shuffle=True,num_workers=0)
-    val_loader=DataLoader(val_dataset,batch_size=batch_size,shuffle=False,num_workers=0)
-    test_loader=DataLoader(test_dataset,batch_size=batch_size,shuffle=False,num_workers=0)
+    train_loader=DataLoader(train_dataset,batch_size=my_batch_size,shuffle=True,num_workers=0)
+    val_loader=DataLoader(val_dataset,batch_size=my_batch_size,shuffle=False,num_workers=0)
+    test_loader=DataLoader(test_dataset,batch_size=my_batch_size,shuffle=False,num_workers=0)
 
     return train_loader,val_loader,test_loader,train_dataset.classes
